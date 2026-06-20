@@ -22,9 +22,20 @@
     --font-display: 'Times New Roman', Times, 'Georgia', serif;
     --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
     --font-mono: 'Courier New', Courier, monospace;
+    --lightbox-bg: rgba(15,14,12,0.92);
   }
 
-  html { background: var(--bg); }
+  html.dark {
+    --bg: #111110;
+    --card-bg: #1c1c1a;
+    --text-primary: #e8e5de;
+    --text-secondary: #9a9a94;
+    --text-tertiary: #5a5a55;
+    --border: rgba(232,229,222,0.10);
+    --lightbox-bg: rgba(0,0,0,0.95);
+  }
+
+  html { background: var(--bg); transition: background 0.2s; }
 
   body {
     font-family: var(--font-body);
@@ -33,6 +44,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: background 0.2s, color 0.2s;
   }
 
   nav {
@@ -111,6 +123,7 @@
     padding: 1.5rem 1.25rem 1.25rem;
     background: var(--card-bg);
     border: 1px solid var(--text-primary);
+    transition: background 0.2s, border-color 0.2s;
   }
 
   .card--photo { background: transparent; }
@@ -174,6 +187,7 @@
     color: var(--text-secondary);
   }
 
+  /* ── Footer ── */
   footer {
     display: flex;
     justify-content: space-between;
@@ -184,15 +198,141 @@
     font-size: 0.85rem;
     letter-spacing: 0.06em;
     color: var(--text-primary);
+    transition: border-color 0.2s;
   }
 
   footer a { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
+
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  /* ── Dark/light toggle ── */
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+  .theme-toggle:hover { opacity: 1; }
+  .theme-toggle svg { display: block; }
+  .icon-sun { display: none; }
+  .icon-moon { display: block; }
+  html.dark .icon-sun { display: block; }
+  html.dark .icon-moon { display: none; }
+
+  /* ── Lightbox ── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--lightbox-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .lightbox.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .lightbox-inner {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+    max-width: 1100px;
+    width: 100%;
+    max-height: 90vh;
+    transform: translateY(10px);
+    transition: transform 0.25s;
+  }
+
+  .lightbox.open .lightbox-inner {
+    transform: translateY(0);
+  }
+
+  .lightbox-img-wrap {
+    flex: 1 1 60%;
+    min-width: 0;
+  }
+
+  .lightbox-img-wrap img {
+    display: block;
+    width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .lightbox-text {
+    flex: 0 0 260px;
+    color: #e8e5de;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 0.25rem;
+  }
+
+  .lightbox-subject {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: #f0ede6;
+  }
+
+  .lightbox-location {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(232,229,222,0.5);
+  }
+
+  .lightbox-note {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: rgba(232,229,222,0.72);
+    margin-top: 0.25rem;
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.75rem;
+    background: none;
+    border: none;
+    color: rgba(232,229,222,0.55);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.15s;
+    padding: 0;
+  }
+  .lightbox-close:hover { color: #f0ede6; }
 
   @media (max-width: 900px) {
     .grid { grid-template-columns: repeat(3, 1fr); }
     .col:nth-child(4), .col:nth-child(5) { display: none; }
     nav { padding: 1.5rem; }
     main { padding: 0.5rem 1.5rem 2rem; }
+    .lightbox-inner { flex-direction: column; gap: 1.5rem; }
+    .lightbox-text { flex: none; width: 100%; }
   }
 
   @media (max-width: 600px) {
@@ -200,6 +340,7 @@
     .col:nth-child(3), .col:nth-child(4), .col:nth-child(5) { display: none; }
     nav { flex-direction: column; gap: 1rem; }
     .filter-nav { font-size: 0.8rem; }
+    .lightbox { padding: 1rem; }
   }
 </style>
 </head>
@@ -227,7 +368,13 @@
         <h2 class="card-title">Project Title</h2>
         <p class="card-body">Description forthcoming.</p>
       </a>
-      <a class="card card--photo" data-category="personal" href="#">
+      <a class="card card--photo" data-category="personal" href="#"
+         data-lightbox="true"
+         data-src="images/crowntipped.jpg"
+         data-alt="Crown tipped coral fungus"
+         data-subject="Crown-Tipped Coral Fungus"
+         data-location="Shades State Park, Indiana"
+         data-note="One of the stranger finds along the Sugar Creek trail — these delicate, branching fruiting bodies were scattered across a mossy bank, easy to miss if you aren't looking low. I've returned to this stretch of trail a few times and found them reliably in the same damp hollow.">
         <div class="photo-wrap">
           <img src="images/crowntipped.jpg" alt="Crown tipped coral fungus" loading="lazy">
           <span class="photo-caption">Crown-tipped coral fungus, Shades State Park</span>
@@ -237,7 +384,13 @@
 
     <!-- COL 2 (even): photo top, text bottom -->
     <div class="col col--even">
-      <a class="card card--photo" data-category="personal" href="#">
+      <a class="card card--photo" data-category="personal" href="#"
+         data-lightbox="true"
+         data-src="images/frog.jpg"
+         data-alt="Gray tree frog"
+         data-subject="Gray Tree Frog"
+         data-location="Hoosier National Forest, Indiana"
+         data-note="Found him pressed flat against a piece of shagbark hickory, nearly impossible to see. Gray tree frogs are remarkable at matching the precise texture and tone of lichen-covered bark — this one barely moved the entire time I watched him, trusting the camouflage entirely.">
         <div class="photo-wrap">
           <img src="images/frog.jpg" alt="Gray tree frog" loading="lazy">
           <span class="photo-caption">Gray tree frog blending into bark, Hoosier National Forest</span>
@@ -257,7 +410,13 @@
         <h2 class="card-title">Project Title</h2>
         <p class="card-body">Description forthcoming.</p>
       </a>
-      <a class="card card--photo" data-category="personal" href="#">
+      <a class="card card--photo" data-category="personal" href="#"
+         data-lightbox="true"
+         data-src="images/fjord.jpg"
+         data-alt="Fjord"
+         data-subject="Aurlandsfjord at Dusk"
+         data-location="Flåm, Norway"
+         data-note="Taken from the valley floor just after the last tour boat left. The light here changes fast — within twenty minutes the mountains had gone from warm copper to a flat blue-grey. The silence after the engines cut out was the more striking thing.">
         <div class="photo-wrap">
           <img src="images/fjord.jpg" alt="Fjord" loading="lazy">
           <span class="photo-caption">Aurlandsfjord valley at dusk, Flåm, Norway</span>
@@ -267,7 +426,13 @@
 
     <!-- COL 4 (even): photo top, text bottom -->
     <div class="col col--even">
-      <a class="card card--photo" data-category="personal" href="#">
+      <a class="card card--photo" data-category="personal" href="#"
+         data-lightbox="true"
+         data-src="images/mushroom.jpg"
+         data-alt="Mushroom"
+         data-subject="Young Mushroom"
+         data-location="New England"
+         data-note="Came up overnight after two days of rain, pushing through a mat of old pine needles. I've never been able to pin down the species with certainty — the cap shape and color shift considerably as they mature, and I've found several variations within a few feet of each other.">
         <div class="photo-wrap">
           <img src="images/mushroom.jpg" alt="Mushroom" loading="lazy">
           <span class="photo-caption">Young mushroom emerges from pine duff, New England</span>
@@ -287,10 +452,16 @@
         <h2 class="card-title">Project Title</h2>
         <p class="card-body">Description forthcoming.</p>
       </a>
-      <a class="card card--photo" data-category="personal" href="#">
+      <a class="card card--photo" data-category="personal" href="#"
+         data-lightbox="true"
+         data-src="images/blueheron.jpg"
+         data-alt="Heron"
+         data-subject="Great Blue Heron"
+         data-location="Alewife Brook Reservation, Massachusetts"
+         data-note="I've seen this heron — or one I've come to think of as the same bird — in several locations throughout the reservation, though he seems to favor a handful of familiar spots along the brook. He tolerates a closer approach than most, standing motionless until the last possible moment.">
         <div class="photo-wrap">
           <img src="images/blueheron.jpg" alt="Heron" loading="lazy">
-          <span class="photo-caption">Blue heron, Alewife Brook Reservationk</span>
+          <span class="photo-caption">Blue heron, Alewife Brook Reservation</span>
         </div>
       </a>
     </div>
@@ -300,10 +471,58 @@
 
 <footer>
   <span>© 2026. L. Carolan.</span>
-  <a href="mailto:liampcarolan1@gmail.com">Email Contact</a>
+  <div class="footer-right">
+    <a href="mailto:liampcarolan1@gmail.com">Email Contact</a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+      <!-- Moon (shown in light mode) -->
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <!-- Sun (shown in dark mode) -->
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
 </footer>
 
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="lightbox-close" id="lightbox-close">Close ✕</button>
+  <div class="lightbox-inner">
+    <div class="lightbox-img-wrap">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+    <div class="lightbox-text">
+      <div class="lightbox-subject" id="lightbox-subject"></div>
+      <div class="lightbox-location" id="lightbox-location"></div>
+      <p class="lightbox-note" id="lightbox-note"></p>
+    </div>
+  </div>
+</div>
+
 <script>
+  // ── Theme toggle ──
+  const html = document.documentElement;
+  const toggleBtn = document.getElementById('theme-toggle');
+
+  // Persist preference
+  if (localStorage.getItem('theme') === 'dark') html.classList.add('dark');
+
+  toggleBtn.addEventListener('click', () => {
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+
+  // ── Filter ──
   function filterCards(el, cat) {
     document.querySelectorAll('#filter-nav a').forEach(a => a.classList.remove('active'));
     el.classList.add('active');
@@ -311,6 +530,48 @@
       card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
     });
   }
+
+  // ── Lightbox ──
+  const lightbox   = document.getElementById('lightbox');
+  const lbImg      = document.getElementById('lightbox-img');
+  const lbSubject  = document.getElementById('lightbox-subject');
+  const lbLocation = document.getElementById('lightbox-location');
+  const lbNote     = document.getElementById('lightbox-note');
+  const lbClose    = document.getElementById('lightbox-close');
+
+  function openLightbox(card) {
+    lbImg.src         = card.dataset.src;
+    lbImg.alt         = card.dataset.alt;
+    lbSubject.textContent  = card.dataset.subject;
+    lbLocation.textContent = card.dataset.location;
+    lbNote.textContent     = card.dataset.note;
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    // Brief delay before clearing src so the fade-out looks clean
+    setTimeout(() => { lbImg.src = ''; }, 250);
+  }
+
+  document.querySelectorAll('[data-lightbox="true"]').forEach(card => {
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      openLightbox(card);
+    });
+  });
+
+  lbClose.addEventListener('click', closeLightbox);
+
+  lightbox.addEventListener('click', e => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+  });
 </script>
 
 </body>
