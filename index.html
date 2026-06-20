@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="icon" href="/favicon.ico">
+
 <title>Archive — L. Carolan</title>
 
 <style>
-/* ===== YOUR ORIGINAL CSS (UNCHANGED) ===== */
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -22,9 +22,18 @@
   --text-tertiary: #9a9a94;
   --border: rgba(26,26,24,0.12);
   --radius: 14px;
-  --font-display: 'Times New Roman', Times, 'Georgia', serif;
+  --font-display: 'Times New Roman', Times, Georgia, serif;
   --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'Courier New', Courier, monospace;
+}
+
+body.dark {
+  --bg: #0f0f10;
+  --card-bg: #1a1a1c;
+  --text-primary: #f2f2ee;
+  --text-secondary: #b5b5ad;
+  --text-tertiary: #7a7a73;
+  --border: rgba(255,255,255,0.12);
 }
 
 html { background: var(--bg); }
@@ -38,10 +47,71 @@ body {
   flex-direction: column;
 }
 
-/* ... all your existing styles unchanged ... */
+/* ===== NAV ===== */
+nav {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2rem 2.5rem 1.5rem;
+}
 
-/* LIGHTBOX */
+.site-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 400;
+}
 
+.filter-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.filter-nav a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.filter-nav a.active {
+  text-decoration: underline;
+}
+
+/* ===== GRID ===== */
+main { flex: 1; padding: 0.5rem 2rem 2rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.col { display: flex; flex-direction: column; gap: 14px; }
+
+.card {
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card--text {
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+}
+
+.card--photo img {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius);
+}
+
+/* ===== LIGHTBOX ===== */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -56,82 +126,139 @@ body {
 .lightbox.active { display: flex; }
 
 .lightbox-content {
-  width: 100%;
   max-width: 900px;
+  width: 100%;
   max-height: 90vh;
   overflow-y: auto;
 }
 
 .lightbox img {
   width: 100%;
-  height: auto;
   border-radius: var(--radius);
   margin-bottom: 2rem;
 }
 
-.field-note { color: #f5f5f0; max-width: 700px; }
-
-.field-note h2 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
-}
-
-.field-location {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 1.5rem;
-}
-
-.field-note p {
-  line-height: 1.8;
-  color: rgba(255,255,255,0.85);
-}
+.field-note { color: #f5f5f0; }
 
 .close-btn {
   position: fixed;
   top: 30px;
   right: 40px;
-  border: none;
-  background: none;
-  color: white;
   font-size: 2.5rem;
+  background: none;
+  border: none;
+  color: white;
   cursor: pointer;
 }
 
+/* ===== FOOTER ===== */
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2.5rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+footer a { color: var(--text-primary); }
+
+/* icon button */
+.icon-btn {
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-primary);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== YOUR HTML CONTENT (UNCHANGED) ===== -->
 <nav>
   <span class="site-title">ARCHIVE</span>
-  <div class="filter-nav" id="filter-nav">
+  <div class="filter-nav">
     FILTER:
-    <a class="active" data-filter="all" onclick="filterCards(this,'all')">ALL</a>
-    <span>/</span>
-    <a data-filter="professional" onclick="filterCards(this,'professional')">PROFESSIONAL</a>
-    <span>/</span>
-    <a data-filter="personal" onclick="filterCards(this,'personal')">PERSONAL</a>
+    <a class="active" onclick="filterCards(this,'all')">ALL</a>
+    /
+    <a onclick="filterCards(this,'professional')">PROFESSIONAL</a>
+    /
+    <a onclick="filterCards(this,'personal')">PERSONAL</a>
   </div>
 </nav>
 
 <main>
   <div class="grid" id="grid">
 
-    <!-- (your full grid stays exactly the same — omitted here for brevity) -->
+    <div class="col">
+      <a class="card card--photo" data-category="personal" href="#">
+        <img src="images/crowntipped.jpg">
+      </a>
+      <a class="card card--text" data-category="professional" href="#">
+        <h2>Project Title</h2>
+        <p>Description forthcoming.</p>
+      </a>
+    </div>
+
+    <div class="col">
+      <a class="card card--photo" data-category="personal" href="#">
+        <img src="images/frog.jpg">
+      </a>
+      <a class="card card--text" data-category="professional" href="#">
+        <h2>Project Title</h2>
+      </a>
+    </div>
+
+    <div class="col">
+      <a class="card card--photo" data-category="personal" href="#">
+        <img src="images/fjord.jpg">
+      </a>
+      <a class="card card--text" data-category="professional" href="#">
+        <h2>Project Title</h2>
+      </a>
+    </div>
+
+    <div class="col">
+      <a class="card card--photo" data-category="personal" href="#">
+        <img src="images/mushroom.jpg">
+      </a>
+      <a class="card card--text" data-category="professional" href="#">
+        <h2>Project Title</h2>
+      </a>
+    </div>
+
+    <div class="col">
+      <a class="card card--photo"
+        data-title="Great Blue Heron"
+        data-location="Alewife Brook Reservation"
+        data-note="Field observation notes..."
+        data-category="personal"
+        href="#">
+        <img src="images/blueheron.jpg">
+      </a>
+    </div>
 
   </div>
 </main>
 
 <footer>
   <span>© 2026. L. Carolan.</span>
-  <a href="mailto:liampcarolan1@gmail.com">Email Contact</a>
+
+  <div style="display:flex; gap:1rem; align-items:center;">
+    <a href="mailto:liampcarolan1@gmail.com">Email Contact</a>
+
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+      ☾
+    </button>
+  </div>
 </footer>
 
 <!-- LIGHTBOX -->
@@ -139,57 +266,77 @@ body {
   <button class="close-btn">&times;</button>
 
   <div class="lightbox-content">
-    <img id="lightbox-image" src="">
+    <img id="lightbox-image">
     <div class="field-note">
       <h2 id="lightbox-title"></h2>
-      <div class="field-location" id="lightbox-location"></div>
+      <div id="lightbox-location"></div>
       <p id="lightbox-note"></p>
     </div>
   </div>
 </div>
 
-<!-- FIXED SCRIPT -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
   const lightbox = document.getElementById('lightbox');
 
-  // PHOTO CLICK
+  // LIGHTBOX
   document.querySelectorAll('.card--photo').forEach(card => {
-    card.addEventListener('click', function(e) {
+    card.addEventListener('click', e => {
       e.preventDefault();
 
-      const img = this.querySelector('img');
+      const img = card.querySelector('img');
 
       document.getElementById('lightbox-image').src = img.src;
-      document.getElementById('lightbox-title').textContent = this.dataset.title || '';
-      document.getElementById('lightbox-location').textContent = this.dataset.location || '';
-      document.getElementById('lightbox-note').textContent = this.dataset.note || '';
+      document.getElementById('lightbox-title').textContent = card.dataset.title || '';
+      document.getElementById('lightbox-location').textContent = card.dataset.location || '';
+      document.getElementById('lightbox-note').textContent = card.dataset.note || '';
 
       lightbox.classList.add('active');
     });
   });
 
-  // CLOSE BUTTON
-  document.querySelector('.close-btn').addEventListener('click', () => {
+  document.querySelector('.close-btn').onclick = () =>
     lightbox.classList.remove('active');
+
+  lightbox.onclick = e => {
+    if (e.target === lightbox) lightbox.classList.remove('active');
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lightbox.classList.remove('active');
   });
 
-  // CLICK OUTSIDE
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) {
-      lightbox.classList.remove('active');
-    }
-  });
+  // THEME
+  const btn = document.getElementById('themeToggle');
 
-  // ESC KEY
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      lightbox.classList.remove('active');
-    }
-  });
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    btn.textContent = '☀';
+  }
+
+  btn.onclick = () => {
+    document.body.classList.toggle('dark');
+
+    const isDark = document.body.classList.contains('dark');
+    btn.textContent = isDark ? '☀' : '☾';
+
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  };
 
 });
+
+// FILTER
+function filterCards(el, cat) {
+  document.querySelectorAll('.filter-nav a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+
+  document.querySelectorAll('.card').forEach(card => {
+    if (!card.dataset.category) return;
+    card.style.display =
+      cat === 'all' || card.dataset.category === cat ? '' : 'none';
+  });
+}
 </script>
 
 </body>
