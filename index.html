@@ -201,6 +201,84 @@
     nav { flex-direction: column; gap: 1rem; }
     .filter-nav { font-size: 0.8rem; }
   }
+
+ /* LIGHTBOX */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.92);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  z-index: 1000;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+.lightbox-content {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.lightbox img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+
+.field-note {
+  color: #f5f5f0;
+  max-width: 700px;
+}
+
+.field-note h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.field-location {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 1.5rem;
+}
+
+.field-note p {
+  line-height: 1.8;
+  color: rgba(255,255,255,0.85);
+}
+
+.close-btn {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 2.5rem;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .lightbox {
+    padding: 1.5rem;
+  }
+
+  .field-note h2 {
+    font-size: 1.5rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -287,11 +365,19 @@
         <h2 class="card-title">Project Title</h2>
         <p class="card-body">Description forthcoming.</p>
       </a>
-      <a class="card card--photo" data-category="personal" href="#">
-        <div class="photo-wrap">
-          <img src="images/blueheron.jpg" alt="Heron" loading="lazy">
-          <span class="photo-caption">Blue heron, Alewife Brook Reservationk</span>
-        </div>
+      <a class="card card--photo"
+        data-category="personal"
+        data-title="Great Blue Heron"
+        data-location="Alewife Brook Reservation"
+        data-note="I've seen this heron in several locations throughout the reservation, though he seems to favor a handful of familiar spots. I return to the brook regularly to observe the wildlife that persists here despite the surrounding development. Most visits involve long periods of stillness. The heron stands motionless until a fish passes within reach, at which point the entire scene changes in an instant."
+        href="#">
+     
+       <div class="photo-wrap">
+         <img src="images/blueheron.jpg" alt="Heron" loading="lazy">
+         <span class="photo-caption">
+           Blue heron, Alewife Brook Reservation
+         </span>
+       </div>
       </a>
     </div>
 
@@ -304,14 +390,86 @@
 </footer>
 
 <script>
-  function filterCards(el, cat) {
-    document.querySelectorAll('#filter-nav a').forEach(a => a.classList.remove('active'));
-    el.classList.add('active');
-    document.querySelectorAll('.card[data-category]').forEach(card => {
-      card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
-    });
+
+function filterCards(el, cat) {
+  document.querySelectorAll('#filter-nav a').forEach(a => {
+    a.classList.remove('active');
+  });
+
+  el.classList.add('active');
+
+  document.querySelectorAll('.card[data-category]').forEach(card => {
+    card.style.display =
+      (cat === 'all' || card.dataset.category === cat)
+      ? ''
+      : 'none';
+  });
+}
+
+const lightbox = document.getElementById('lightbox');
+
+document.querySelectorAll('.card--photo').forEach(card => {
+
+  card.addEventListener('click', function(e) {
+
+    e.preventDefault();
+
+    const img = this.querySelector('img');
+
+    document.getElementById('lightbox-image').src =
+      img.src;
+
+    document.getElementById('lightbox-title').textContent =
+      this.dataset.title || '';
+
+    document.getElementById('lightbox-location').textContent =
+      this.dataset.location || '';
+
+    document.getElementById('lightbox-note').textContent =
+      this.dataset.note || '';
+
+    lightbox.classList.add('active');
+  });
+
+});
+
+document.querySelector('.close-btn').addEventListener('click', () => {
+  lightbox.classList.remove('active');
+});
+
+lightbox.addEventListener('click', function(e) {
+  if (e.target === lightbox) {
+    lightbox.classList.remove('active');
   }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    lightbox.classList.remove('active');
+  }
+});
+
 </script>
 
+ <div class="lightbox" id="lightbox">
+
+  <button class="close-btn">&times;</button>
+
+  <div class="lightbox-content">
+
+    <img id="lightbox-image" src="">
+
+    <div class="field-note">
+      <h2 id="lightbox-title"></h2>
+
+      <div class="field-location"
+           id="lightbox-location"></div>
+
+      <p id="lightbox-note"></p>
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>
