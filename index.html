@@ -336,7 +336,18 @@
   }
 
   @media (max-width: 600px) {
-    .grid { grid-template-columns: repeat(2, 1fr); }
+    .grid {
+      display: block;
+      column-count: 2;
+      column-gap: 14px;
+    }
+    .col { display: contents; }
+    .card {
+      break-inside: avoid;
+      margin-bottom: 14px;
+    }
+    .col--odd .card--photo img,
+    .col--even .card--photo img { height: auto; }
     nav { flex-direction: column; gap: 1rem; }
     .filter-nav { font-size: 0.8rem; }
     .lightbox { padding: 1rem; }
